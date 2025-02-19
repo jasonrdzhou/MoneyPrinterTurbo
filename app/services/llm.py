@@ -12,7 +12,7 @@ from app.config import config
 
 _max_retries = 5
 
-
+# 返回搜索关键词列表
 def _generate_response(prompt: str) -> str:
     try:
         content = ""
@@ -259,6 +259,8 @@ def _generate_response(prompt: str) -> str:
         return f"Error: {str(e)}"
 
 
+
+# 生成带货文案
 def generate_script(
     video_subject: str, language: str = "", paragraph_number: int = 1
 ) -> str:
@@ -333,6 +335,7 @@ Generate a script for a video, depending on the subject of the video.
     return final_script.strip()
 
 
+# 生成每个片段小视频
 def generate_terms(video_subject: str, video_script: str, amount: int = 5) -> List[str]:
     prompt = f"""
 # Role: Video Search Terms Generator
@@ -360,7 +363,7 @@ Generate {amount} search terms for stock videos, depending on the subject of a v
 Please note that you must use English for generating video search terms; Chinese is not accepted.
 """.strip()
 
-    logger.info(f"subject: {video_subject}")
+    logger.info(f"subject: {video_subject}",f"prompt:{prompt}")
 
     search_terms = []
     response = ""
@@ -370,6 +373,7 @@ Please note that you must use English for generating video search terms; Chinese
             if "Error: " in response:
                 logger.error(f"failed to generate video script: {response}")
                 return response
+            logger.info(f"生成res: {response}")
             search_terms = json.loads(response)
             if not isinstance(search_terms, list) or not all(
                 isinstance(term, str) for term in search_terms

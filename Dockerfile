@@ -10,11 +10,21 @@ RUN chmod 777 /MoneyPrinterTurbo
 ENV PYTHONPATH="/MoneyPrinterTurbo"
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    imagemagick \
-    ffmpeg \
+# RUN apt-get update && apt-get install -y \
+#     git \
+#     imagemagick \
+#     ffmpeg \
+#     && rm -rf /var/lib/apt/lists/*
+
+
+RUN echo "deb http://mirrors.aliyun.com/debian/ bullseye main contrib non-free" > /etc/apt/sources.list \
+    && echo "deb http://mirrors.aliyun.com/debian/ bullseye-updates main contrib non-free" >> /etc/apt/sources.list \
+    && echo "deb http://mirrors.aliyun.com/debian-security/ bullseye-security main contrib non-free" >> /etc/apt/sources.list
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && apt-get update && apt-get install -y git imagemagick ffmpeg \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Fix security policy for ImageMagick
 RUN sed -i '/<policy domain="path" rights="none" pattern="@\*"/d' /etc/ImageMagick-6/policy.xml
@@ -23,8 +33,9 @@ RUN sed -i '/<policy domain="path" rights="none" pattern="@\*"/d' /etc/ImageMagi
 COPY requirements.txt ./
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
+# RUN pip install --no-cache-dir -r  requirements.txt
+RUN pip install --no-cache-dir -i https://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
+# 
 # Now copy the rest of the codebase into the image
 COPY . .
 
